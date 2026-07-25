@@ -17,6 +17,8 @@ export const NotFoundPageType: QuartzPageTypePlugin = () => ({
       text: notFound,
       description: notFound,
       frontmatter: { title: notFound, tags: [] },
+      // Keep the synthesized 404 page out of listing surfaces like RecentNotes.
+      unlisted: true,
     })
 
     return [
