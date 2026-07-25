@@ -2,7 +2,7 @@
 publish: true
 title: Docker Training
 created: 2026-07-24
-modified: 2026-07-25T21:50:12.277+05:30
+modified: 2026-07-25T22:43:45.008+05:30
 tags:
   - docker
   - learning
@@ -545,7 +545,7 @@ docker container create --name ad1 --publish 18080:8080 adminer
 - Adminer connects to Postgres/MySQL internally over the Docker network.
 - Port forwarding is only needed for **external → container** access; container-to-container traffic stays on the internal Docker network.
 
-## Docker Networks
+## 12. Docker Networks
 
 Docker networks provide a software-defined way to connect containers and simulate a network experience, making them act as separate machines on a shared network.
 
@@ -576,7 +576,7 @@ There are three default networks — `bridge`, `host`, and `none` — plus the M
 4. **MAC VLAN & IP VLAN Methods**
    - These drivers allow containers to appear as physical devices on your network, meaning they can be accessed directly from outside the host without standard port forwarding.
 
-## IP Address Management (IPAM)
+## 13. IP Address Management (IPAM)
 
 Network properties include an **IPAM** section, which defines the range of IP addresses allocated to the network.
 
@@ -584,7 +584,7 @@ Network properties include an **IPAM** section, which defines the range of IP ad
 - **Reserved Addresses:** Generally, `0` is reserved for the network address, and `255` is used for broadcast.
 - **CIDR & Subnets:** IP addresses are accompanied by a subnet mask using CIDR notation (e.g., `/16` or `/24`), which dictates the network size.
 
-## Custom Networks and DNS
+## 14. Custom Networks and DNS
 
 **Best Practice:** _Always create your own custom network._
 
@@ -623,7 +623,7 @@ docker container create --name pn4 --network pnet1 --network-alias webserver ngi
 - If multiple containers share the same network alias, and something hits that alias, Docker automatically load-balances requests across them.
 - Use case: one way of achieving load balancing and redundancy is giving the same network alias to multiple containers.
 
-## Inspecting a Network (Example)
+## 15. Inspecting a Network (Example)
 
 Running `docker network inspect bridge` provides detailed information about the network, including its IPAM configuration and connected containers.
 
@@ -664,7 +664,7 @@ Running `docker network inspect bridge` provides detailed information about the 
 ]
 ```
 
-## Docker Compose
+## 16. Docker Compose
 
 **Evolution:** Previously, `docker-compose` was a separate, standalone tool. It has now been integrated directly into Docker as `docker compose`.
 
@@ -786,7 +786,7 @@ services:
 - `docker compose exec` — no need to add `-it`; use the **service name** instead of the container name.
 - `prune` command — _(noted, not yet detailed)_.
 
-## Docker Images
+## 17. Docker Images
 
 ### Indicators of Bad Images
 
@@ -794,7 +794,7 @@ services:
 - The image size should not be big.
 - Every app should be a separate container — single responsibility. Layer planning should be done, but avoid too many layers, as it causes load on the union file system.
 
-## How to Plan and Create Your Own Image?
+## 18. How to Plan and Create Your Own Image?
 
 - **Step 1:** Identify your PID 1
 - **Step 2:** List all dependencies of **Step 1**
