@@ -2,7 +2,7 @@
 publish: true
 title: Docker Training
 created: 2026-07-24
-modified: 2026-07-25T22:43:45.008+05:30
+modified: 2026-07-26T18:54:36.589+05:30
 tags:
   - docker
   - learning
@@ -25,10 +25,17 @@ Hardware
 
 **Containerization vs. Virtualization**
 
-||Containerization|Virtualization|
-|---|---|---|
-|Mechanism|Packages an app as an isolated process sharing the **host's kernel**|Uses a **Hypervisor** to abstract hardware and run a full, independent guest OS|
-|Overhead|Lightweight|Heavier|
+|           | Containerization                                                     | Virtualization                                                                  |
+| --------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Mechanism | Packages an app as an isolated process sharing the **host's kernel** | Uses a **Hypervisor** to abstract hardware and run a full, independent guest OS |
+| Overhead  | Lightweight                                                          | Heavier                                                                         |
+
+### Hardware
+
+- Most traditional servers and older PCs run on **`amd64`** (also known as x86\_64, built by Intel and AMD). In contrast, Apple's M-series chips (M1, M2, M3) and modern cloud processors (like AWS Graviton) run on **`arm64`**. These architectures process instructions entirely differently at the hardware level, meaning a binary compiled for one cannot natively run on the other.
+- `eclipse-temurin:8-jre-alpine`: This specific image causes problems on Apple chips because it is an older version of Java (Java 8) running on a highly stripped-down Linux distribution (Alpine). The publishers of this image never created an `arm64` version of this specific combination.
+- To bridge this hardware divide, modern containers are usually built as **multi-arch images**. When a publisher pushes a multi-arch image to Docker Hub, they bundle several different architecture builds under a single tag.
+- When you type `docker pull`, your machine checks the image's manifest and automatically downloads the exact version built for your hardware. However, because compiling and testing for multiple architectures takes time and resources, many older, legacy, or community-maintained images are never updated to include an `arm64` build.
 
 ### Kernel-Level Isolation Primitives
 
@@ -69,10 +76,10 @@ A **userland library** sits on top of these kernel primitives so higher-level to
 
 ### What's in an Image?
 
-|Component|Description|
-|---|---|
-|**Metadata**|Instructions for the container runtime: isolation rules, memory limits, the primary process (`CMD`), etc.|
-|**Data**|The actual file system contents present in every container built from the image|
+| Component    | Description                                                                                               |
+| ------------ | --------------------------------------------------------------------------------------------------------- |
+| **Metadata** | Instructions for the container runtime: isolation rules, memory limits, the primary process (`CMD`), etc. |
+| **Data**     | The actual file system contents present in every container built from the image                           |
 
 **The Primary Process (CMD)** starts and stops everything in the container. The lifetime of the primary process **is** the lifetime of the container.
 
@@ -80,10 +87,10 @@ Images are built with tooling and published to a **registry**.
 
 ## 4. Standards: OCI & CNCF
 
-|Body|Role|
-|---|---|
-|**OCI** (Open Container Initiative)|Owned by the Linux Foundation. Defines the _standard_ for what a container is, what an image is, and how isolation works. Maintains `runc`.|
-|**CNCF** (Cloud Native Computing Foundation)|Hosts tools and platforms built on top of OCI standards (e.g., Kubernetes, `containerd`).|
+| Body                                         | Role                                                                                                                                        |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **OCI** (Open Container Initiative)          | Owned by the Linux Foundation. Defines the _standard_ for what a container is, what an image is, and how isolation works. Maintains `runc`. |
+| **CNCF** (Cloud Native Computing Foundation) | Hosts tools and platforms built on top of OCI standards (e.g., Kubernetes, `containerd`).                                                   |
 
 **Key components:**
 
@@ -629,38 +636,38 @@ Running `docker network inspect bridge` provides detailed information about the 
 
 ```json
 [
-    {
-        "Name": "bridge",
-        "Id": "9025e0d8...",
-        "Scope": "local",
-        "Driver": "bridge",
-        "IPAM": {
-            "Config": [
-                {
-                    "Subnet": "172.17.0.0/16",
-                    "Gateway": "172.17.0.1"
-                }
-            ]
-        },
-        "Containers": {
-            "10a939...": {
-                "Name": "ad1",
-                "IPv4Address": "172.17.0.3/16"
-            },
-            "729d19...": {
-                "Name": "n2",
-                "IPv4Address": "172.17.0.5/16"
-            },
-            "8d6264...": {
-                "Name": "n1",
-                "IPv4Address": "172.17.0.4/16"
-            },
-            "dbcb8c...": {
-                "Name": "pg1",
-                "IPv4Address": "172.17.0.2/16"
-            }
+  {
+    "Name": "bridge",
+    "Id": "9025e0d8...",
+    "Scope": "local",
+    "Driver": "bridge",
+    "IPAM": {
+      "Config": [
+        {
+          "Subnet": "172.17.0.0/16",
+          "Gateway": "172.17.0.1"
         }
+      ]
+    },
+    "Containers": {
+      "10a939...": {
+        "Name": "ad1",
+        "IPv4Address": "172.17.0.3/16"
+      },
+      "729d19...": {
+        "Name": "n2",
+        "IPv4Address": "172.17.0.5/16"
+      },
+      "8d6264...": {
+        "Name": "n1",
+        "IPv4Address": "172.17.0.4/16"
+      },
+      "dbcb8c...": {
+        "Name": "pg1",
+        "IPv4Address": "172.17.0.2/16"
+      }
     }
+  }
 ]
 ```
 
@@ -687,9 +694,9 @@ Running `docker network inspect bridge` provides detailed information about the 
 
     ```yml
     array_field_1:
-    - value1
-    - value2
-    - value3
+      - value1
+      - value2
+      - value3
     ```
 
   - `map`: A field contains objects with properties. The sub properties are indented two spaces. Each level is two spaces of indentation.
@@ -754,8 +761,8 @@ services:
       - db-net
     environment:
       - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=something    
-  
+      - POSTGRES_PASSWORD=something
+
   # Frontend Server Using Adminer
   fe-server:
     image: adminer:5.5.0
@@ -786,42 +793,383 @@ services:
 - `docker compose exec` — no need to add `-it`; use the **service name** instead of the container name.
 - `prune` command — _(noted, not yet detailed)_.
 
+# 26 July, 2026
+
 ## 17. Docker Images
 
 ### Indicators of Bad Images
 
-- Should be a one-shot setup.
-- The image size should not be big.
-- Every app should be a separate container — single responsibility. Layer planning should be done, but avoid too many layers, as it causes load on the union file system.
+- **Manual Intervention Required:** Images should provide a true one-shot setup. If you have to manually configure things after the container starts, the image is poorly designed.
+- **Bloated Size:** Image size should be kept as minimal as possible to reduce pull times and attack surface.
+- **Multiple Responsibilities:** Every app should run in a separate container following the single-responsibility principle.
+- **Excessive Layers:** While layer planning is essential for caching, too many layers place unnecessary load on the Union File System (UFS).
 
-## 18. How to Plan and Create Your Own Image?
+### How to Plan and Create Your Own Image
 
-- **Step 1:** Identify your PID 1
-- **Step 2:** List all dependencies of **Step 1**
-- **Step 3:** Segregate dependencies found in **Step 2** into:
-  - a) Things provided by you
-    - `.env`
-    - `package.json`
-    - Source code
-  - b) Things NOT provided by you
-    - node
-    - npm
-- **Step 4:** Find a good base image based on **Step 3b**
-- **Step 5:** Copy all of **Step 3a** into a directory
+- **Step 1:** Identify your PID 1 (the main process that keeps the container alive).
+- **Step 2:** List all dependencies required to run **Step 1**.
+- **Step 3:** Segregate the dependencies found in **Step 2** into two categories:
+- **a) Things provided by you:** Source code, `.env` files, `package.json`, artifacts, etc.
+- **b) Things NOT provided by you:** Runtime environments (Node.js, Java, Python), package managers (npm, pip), OS utilities.
+- **Step 4:** Select a suitable base image based on the requirements in **Step 3b**.
+- **Step 5:** Copy everything from **Step 3a** into the image's working directory.
 
-### fitnesse.org Example
+### Building an OCI Image
 
-- **Step 1:** Identify your PID 1 -> `java -jar fitnesse-standalone.jar`
-- **Step 2:** List all dependencies of **Step 1** -> Java, JAR file
-- **Step 3:** Segregate dependencies found in **Step 2** into:
-  - a) Things provided by you
-    - `fitnesse-standalone.jar`
-  - b) Things NOT provided by you
-    - Java
-- **Step 4:** Find a good base image based on **Step 3b** -> `eclipse-temurin:8-jre-alpine`
-- **Step 5:** Copy all of **Step 3a** into a directory
+Docker has transitioned to using `buildx` (BuildKit) as the default build engine, providing advanced features like multi-platform builds.
 
-## Related Notes
+#### 1. The Build Context
 
-- [[linux-hacks]]
-- [[ubuntu-terminal]]
+To build an image, you need a **build context directory**. Everything required inside the image must reside within this directory. The entire context is sent to the Docker build engine at the start of the build process.
+
+- **Tip:** Use a `.dockerignore` file to exclude unnecessary files (like local `.git` folders or `node_modules`) from the build context, speeding up the build process.
+
+#### 2. The `Dockerfile`
+
+Create a file named `Dockerfile` in the build context directory. (While you can name it anything, using `Dockerfile` eliminates the need for the `-f` flag during the build). Conventionally, if you have multiple, you might name them `AppName.Dockerfile`.
+
+A Dockerfile consists of:
+
+- **Comments:** Lines starting with `#` are ignored, as are blank lines.
+- **Pragmas:** Directives at the top of the file (e.g., `# syntax=docker/dockerfile:1`) that change how the parser behaves.
+- **Instructions:** Written in UPPERCASE, while their parameters are written in lowercase.
+
+_Legacy Build Behavior Note:_ Older Docker engines built images by creating a container for every single instruction, committing it as a layer, and repeating. Thus, the total layers equaled the base image layers plus the number of instructions. Modern BuildKit optimizes this significantly.
+
+#### 3. Core Instructions
+
+- `FROM`
+  - Specifies the base image to start from. It must be the first instruction (preceded only by optional pragmas or ARGs).
+- `LABEL`
+  - Adds arbitrary metadata as key-value pairs. Docker doesn't use these functionally, but tools like Docker Compose do.
+  - _Convention:_ `LABEL maintainer="Tanuv Nair <tanuvnair@gmail.com>"`
+- `COPY <source_path> <destination_path>`
+  - Copies files or directories from the build context into the image's file system.
+  - **Source path** is _always_ relative to the build context directory.
+  - **Destination path** can be absolute or relative to the `WORKDIR`.
+  - **Trailing Slashes Matter:** The trailing `/` dictates whether Docker treats the target as a file or a directory.
+  - **Combinations & Behaviors:**
+    - `COPY ./file.jar /app/` $\rightarrow$ Copies `file.jar` _into_ the `/app` directory.
+    - `COPY ./file.jar /app` $\rightarrow$ Copies `file.jar` and renames it to `app` (if `/app` doesn't already exist as a directory).
+    - `COPY ./dir-1 /app/subdir/` $\rightarrow$ Copies the _contents_ of `dir-1` into `/app/subdir/`.
+    - `COPY *.html /app/` $\rightarrow$ When using wildcards, the destination _must_ be a directory (ending in `/`).
+- `WORKDIR`
+  - Sets the working directory for any subsequent `RUN`, `CMD`, `ENTRYPOINT`, `COPY`, and `ADD` instructions. When a process runs, it executes from this directory by default.
+- `CMD`
+  - Provides the default command to execute when running a container from the image.
+  - This is strictly metadata added to the image; it is _not_ executed during image build time.
+  - _Best Practice (Exec Form):_ Write it as a JSON array where each element is in double quotes: `CMD ["java", "-jar", "fitnesse-standalone.jar"]`.
+- `EXPOSE`
+  - Documents which ports the container will listen on (e.g., `EXPOSE 80 8080`). This is purely metadata and does not actually publish the port to the host.
+- `VOLUME`
+  - Adds metadata defining a mount point (e.g., `VOLUME /app/FitNesseRoot`).
+  - _Docker-specific behavior:_ If a container is run from an image with a `VOLUME` instruction and no explicit volume is mapped by the user, Docker automatically creates an anonymous volume.
+  - Anonymous volumes cannot be renamed and are typically orphaned unless removed specifically when the container is deleted.
+
+#### 4. Executing the Build
+
+The modern command utilizes BuildKit:
+
+```bash
+docker image build -t fitnesse:1.0-alpine ./fitnesse/
+```
+
+_(If your file is named differently, use `-f ./Custom.Dockerfile`)_
+
+**Multi-Platform Builds:** BuildKit (`buildx`) allows you to build images for architectures other than your host machine (e.g., building for `linux/arm64` on an `amd64` machine).
+
+1. Check available builders: `docker buildx ls`
+2. Create and bootstrap a new builder:
+
+```bash
+docker buildx create --driver docker:container --platform linux/amd64,linux/arm64 --name builder-1 --bootstrap --use
+```
+
+1. Build across platforms using the `--platform` flag:
+
+```bash
+docker buildx build --platform linux/amd64,linux/arm64 -t myapp:latest .
+```
+
+**Image Metadata Example (from `docker image inspect`):**
+
+```json
+"ExposedPorts": {
+	"80/tcp": {}
+},
+"Cmd": [
+	"java",
+	"-jar",
+	"fitnesse-standalone.jar"
+],
+"WorkingDir": "/app",
+"Architecture": "amd64",
+"Os": "linux"
+```
+
+### fitnesse.org Practical Example
+
+- **Step 1:** Identify PID 1 $\rightarrow$ `java -jar fitnesse-standalone.jar`
+- **Step 2:** List dependencies $\rightarrow$ Java Runtime, the JAR file itself.
+- **Step 3:** Segregate dependencies:
+  - **a) Provided by you:** `fitnesse-standalone.jar`
+  - **b) NOT provided by you:** Java Runtime Environment (JRE)
+- **Step 4:** Select base image $\rightarrow$ `eclipse-temurin:11.0.31_11-jre-ubi9-minimal`
+- **Step 5:** Write the Dockerfile.
+
+**`fitnesse.org` Dockerfile:**
+
+```dockerfile
+FROM eclipse-temurin:11.0.31_11-jre-ubi9-minimal
+LABEL maintainer="Tanuv Nair <tanuvnair@gmail.com>"
+
+WORKDIR /app
+COPY ./fitnesse-standalone.jar .
+
+CMD ["java", "-jar", "fitnesse-standalone.jar"]
+EXPOSE 80
+
+```
+
+**Testing and Execution:** To find out where data is being modified or stored inside a running container, use:
+
+```bash
+docker container diff <container_name>
+```
+
+To run the container and explicitly mount a volume to the designated data directory:
+
+```bash
+docker container create \
+  --name f1 \
+  --publish 10800:80 \
+  --mount type=volume,source=f1vol,target=/app/FitNesseRoot/ \
+  fitnesse:1.0.0-minimal
+```
+
+## 18. Docker Hub
+
+### Publishing a Docker Image
+
+The build command used locally can be repurposed for publishing. By default, `buildx` sends the built image to your local Docker engine. To instruct the build tool to push the image directly to a remote registry, append the `--push` flag.
+
+- **Authenticate with the registry:**
+
+```bash
+docker login <registry_name>
+```
+
+- **Build and push across multiple platforms:**
+
+```bash
+docker image build --push --platform=linux/amd64,linux/arm64 \
+-f ./fitnesse/Dockerfile \
+-t docker.io/algorisystanuv/fitnesse:1.0.0-minimal \
+-t docker.io/algorisystanuv/fitnesse:latest \
+./fitnesse/
+```
+
+- _Note:_ Pushing happens iteratively on a layer-by-layer basis. In this command, two tags (`1.0.0-minimal` and `latest`) are built and pushed simultaneously.
+
+## Qubefini
+
+### Core Dockerfile Concepts
+
+- `FROM SCRATCH` **vs. Minimal OS:**
+- Using `FROM SCRATCH` means you start with an entirely empty file system (no OS).
+- Using a minimal userland (like `alpine:3.24`) provides essential OS utilities and files, which is necessary if your app relies on system-level configurations like timezones.
+- `ENTRYPOINT` **vs.** `CMD`**:**
+- **ENTRYPOINT:** Defines the primary executable of the container. It is harder to override at runtime (requires the `--entrypoint` flag, e.g., `--entrypoint /bin/sh`).
+- **CMD:** Provides default arguments to the `ENTRYPOINT`. It is easily overridden by appending commands to the end of `docker run`.
+- _Interaction:_ When both are used, Docker concatenates them (`ENTRYPOINT` + `CMD` = Final Command).
+- _Best Practice:_ If your image runs exactly one app, use `ENTRYPOINT`. If your image houses multiple apps or utilities and you need to specify which one to run dynamically, rely on `CMD`.
+- `ENV`**:**
+- Sets environment variables inside the image.
+- _Security Rule:_ Only use `ENV` for default settings. **Never** put sensitive variables (like API keys or database passwords) in a Dockerfile. Inject those via Docker Compose or `.env` files at runtime.
+- **Go Architecture Variables:**
+- `GOOS` and `GOARCH` are environment variables used by the Go compiler to target specific operating systems and CPU architectures during multi-platform builds.
+- **Creating a Multi-Arch Builder:**
+
+```bash
+docker buildx create --name builder1 --platform=linux/amd64,linux/arm64 --driver=docker-container --bootstrap --use
+```
+
+### Qubefini Architecture Files
+
+**Assumption:** The root directory context for these files is `qubefini-v2`.
+
+#### 1. Initialization Script
+
+**File:** `./init/init.sh`
+
+```bash
+#!/bin/sh -e
+echo "Running database initialization"
+npx prisma migrate deploy
+echo "Prisma migrations done"
+
+echo "Running init-rbac"
+./qubefini-seeder init-rbac
+echo "Finished init-rbac"
+
+echo "Running seed-features-permissions"
+./qubefini-seeder seed-features-permissions
+echo "Finished seed-features-permissions"
+```
+
+#### 2. Init Service Dockerfile
+
+**File:** `./init/qubefini-init.Dockerfile`
+
+```dockerfile
+FROM golang:1.26.5-alpine3.24 AS go-builder
+WORKDIR /app/init
+COPY backend/go.* .
+RUN go mod tidy -v
+COPY backend .
+RUN go build -o bin/qubefini-seeder ./cmd/seeder/
+
+FROM node:24-alpine3.23 AS qubefini-init
+LABEL org.opencontainers.image.authors="Tanuv Nair <tanuvnair@gmail.com>"
+WORKDIR /app/init
+RUN npm install -g prisma@6
+COPY ./backend/prisma ./prisma
+COPY --from=go-builder /app/init/bin/qubefini-seeder .
+COPY ./init/init.sh .
+RUN chmod +x ./init.sh
+CMD ["./init.sh"]
+```
+
+#### 3. Backend API Dockerfile
+
+**File:** `./backend/qubefini-be.Dockerfile`
+
+```dockerfile
+FROM golang:1.26.5-alpine3.24 AS go-builder
+WORKDIR /app/backend
+COPY backend .
+RUN go build -o bin/qubefini-api ./cmd/api/
+
+FROM alpine:3.24 AS qubefini-api-image
+LABEL maintainer="Tanuv Nair <tanuvnair@gmail.com>"
+WORKDIR /app
+ENTRYPOINT ["/app/qubefini-api"]
+CMD [""]
+
+# Here we set the defaults for the environment variables
+ENV PORT=8080 \
+API_KEY_ALLOWED_IPS=127.0.0.1 \
+SCHEDULER_SYNC_INTERVAL=30s \
+TM1_CLIENT_TIMEOUT=300 \
+ETL_DATA_ROOT_PATH="/app/qubefini/data" \
+LOG_FILE_PATH="/tmp/" \
+LOG_TARGET="console" \
+LOG_SAMPLE_INTERVAL="100000" \
+PASSWORD_RESET_TOKEN_EXPIRY_MINUTES=15 \
+APP_NAME="qubefini" \
+NOTIFY_EXPIRY_BEFORE_N_DAYS="1,2,3" \
+DEFAULT_DEPENDENCY_DELAY_SECONDS="30" \
+PAGINATION_GET_ALL_LIMIT="10000" \
+PAGINATION_DEFAULT_LIMIT="10" \
+PAGINATION_DEFAULT_PAGE="1" \
+PAGINATION_MAX_LIMIT="100" \
+MSSQL_VALIDATE_QUERY_TIMEOUT_SECONDS="30"
+
+EXPOSE 8080
+VOLUME /app/qubefini/data
+
+COPY --from=go-builder /app/backend/bin/qubefini-api /app/qubefini-api
+```
+
+#### 4. Frontend Dockerfile
+
+**File:** `./frontend/qubefini-fe.Dockerfile`
+
+```dockerfile
+FROM node:24-alpine3.23 AS node-builder
+WORKDIR /app/frontend
+COPY ./frontend/package*.json .
+RUN npm ci
+COPY ./frontend .
+RUN npm run build
+
+FROM node:24-alpine3.23 AS qubefini-frontend-image
+LABEL org.opencontainers.image.authors="Tanuv Nair <tanuvnair@gmail.com>"
+WORKDIR /app/frontend
+COPY ./frontend/package*.json .
+RUN npm ci
+COPY --from=node-builder /app/frontend/build ./build
+CMD ["npm", "run", "start"]
+```
+
+#### 5. Docker Compose Configuration
+
+**File:** `./compose.yaml`
+
+```yaml
+networks:
+  qf-net: null
+volumes:
+  redis-vol: null
+  pg-vol: null
+  api-scheduler-vol: null
+services:
+  postgres-db-server:
+    image: 'postgres:18.4-alpine3.24'
+    volumes:
+      - 'pg-vol:/var/lib/postgresql'
+    networks:
+      - qf-net
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=something
+      - POSTGRES_DB=minietl
+  redis-server:
+    image: 'redis:8.8.1-alpine'
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis.conf
+    volumes:
+      - >-
+        /home/tanuv/projects/docker-training/qubefini/backend/redis-v2.conf:/usr/local/etc/redis/redis.conf
+      - 'redis-vol:/data'
+    networks:
+      - qf-net
+  qubefini-init:
+    build:
+      context: .
+      dockerfile: ./init/qubefini-init.Dockerfile
+    command:
+      - /bin/sh
+    tty: true
+    stdin_open: true
+    networks:
+      - qf-net
+    env_file:
+      - .be-dev.env
+  qubefini-fe:
+    build:
+      context: .
+      dockerfile: ./frontend/qubefini-fe.Dockerfile
+    networks:
+      - qf-net
+    ports:
+      - 3000
+    env_file:
+      - .fe-dev.env
+  qubefini-api:
+    depends_on:
+      - postgres-db-server
+      - redis-server
+    build:
+      context: .
+      dockerfile: ./backend/qubefini-be.Dockerfile
+    volumes:
+      - 'api-scheduler-vol:/app/qubefini/data'
+    networks:
+      - qf-net
+    ports:
+      - 8080
+    env_file:
+      - .be-dev.env
+```

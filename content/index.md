@@ -1,8 +1,8 @@
 ---
 publish: true
 title: mimir.vunat.in
-created: 2026-07-25T00:03:56.817+05:30
-modified: 2026-07-25T02:00:53.266+05:30
+created: 2026-07-25T08:41:47.249+05:30
+modified: 2026-07-25T01:59:21.992+05:30
 ---
 
 # Welcome to mimir!
