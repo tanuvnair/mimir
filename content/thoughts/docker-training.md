@@ -2,7 +2,7 @@
 publish: true
 title: Docker Training
 created: 2026-07-24
-modified: 2026-07-26T18:54:36.589+05:30
+modified: 2026-07-26T19:01:04.929+05:30
 tags:
   - docker
   - learning
@@ -971,7 +971,7 @@ docker image build --push --platform=linux/amd64,linux/arm64 \
 
 - _Note:_ Pushing happens iteratively on a layer-by-layer basis. In this command, two tags (`1.0.0-minimal` and `latest`) are built and pushed simultaneously.
 
-## Qubefini
+## 19. Qubefini
 
 ### Core Dockerfile Concepts
 
