@@ -2,7 +2,7 @@
 publish: true
 title: Docker Training
 created: 2026-07-24
-modified: 2026-07-26T19:08:36.514+05:30
+modified: 2026-07-26T19:11:15.434+05:30
 tags:
   - docker
   - learning
@@ -795,7 +795,7 @@ services:
 
 # 26 July, 2026
 
-## 17. Docker Images
+## 1. Docker Images
 
 ### Indicators of Bad Images
 
@@ -947,7 +947,7 @@ docker container create \
   fitnesse:1.0.0-minimal
 ```
 
-## 18. Docker Hub
+## 2. Docker Hub
 
 ### Publishing a Docker Image
 
@@ -971,7 +971,7 @@ docker image build --push --platform=linux/amd64,linux/arm64 \
 
 - _Note:_ Pushing happens iteratively on a layer-by-layer basis. In this command, two tags (`1.0.0-minimal` and `latest`) are built and pushed simultaneously.
 
-## 19. Qubefini
+## 3. Qubefini
 
 ### Core Dockerfile Concepts
 
