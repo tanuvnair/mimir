@@ -2,7 +2,7 @@
 publish: true
 title: Docker Training
 created: 2026-07-24
-modified: 2026-07-26T19:01:04.929+05:30
+modified: 2026-07-26T19:08:36.514+05:30
 tags:
   - docker
   - learning
@@ -809,8 +809,8 @@ services:
 - **Step 1:** Identify your PID 1 (the main process that keeps the container alive).
 - **Step 2:** List all dependencies required to run **Step 1**.
 - **Step 3:** Segregate the dependencies found in **Step 2** into two categories:
-- **a) Things provided by you:** Source code, `.env` files, `package.json`, artifacts, etc.
-- **b) Things NOT provided by you:** Runtime environments (Node.js, Java, Python), package managers (npm, pip), OS utilities.
+  - **a) Things provided by you:** Source code, `.env` files, `package.json`, artifacts, etc.
+  - **b) Things NOT provided by you:** Runtime environments (Node.js, Java, Python), package managers (npm, pip), OS utilities.
 - **Step 4:** Select a suitable base image based on the requirements in **Step 3b**.
 - **Step 5:** Copy everything from **Step 3a** into the image's working directory.
 
@@ -842,7 +842,7 @@ _Legacy Build Behavior Note:_ Older Docker engines built images by creating a co
   - Specifies the base image to start from. It must be the first instruction (preceded only by optional pragmas or ARGs).
 - `LABEL`
   - Adds arbitrary metadata as key-value pairs. Docker doesn't use these functionally, but tools like Docker Compose do.
-  - _Convention:_ `LABEL maintainer="Tanuv Nair <tanuvnair@gmail.com>"`
+  - _Convention:_ `LABEL maintainer="Tanuv Nair <tanuvnair@gmail.com>"` (deprecated, use new convention)
 - `COPY <source_path> <destination_path>`
   - Copies files or directories from the build context into the image's file system.
   - **Source path** is _always_ relative to the build context directory.
@@ -879,17 +879,18 @@ _(If your file is named differently, use `-f ./Custom.Dockerfile`)_
 **Multi-Platform Builds:** BuildKit (`buildx`) allows you to build images for architectures other than your host machine (e.g., building for `linux/arm64` on an `amd64` machine).
 
 1. Check available builders: `docker buildx ls`
+
 2. Create and bootstrap a new builder:
 
-```bash
-docker buildx create --driver docker:container --platform linux/amd64,linux/arm64 --name builder-1 --bootstrap --use
-```
+   ```bash
+   docker buildx create --driver docker:container --platform linux/amd64,linux/arm64 --name builder-1 --bootstrap --use
+   ```
 
-1. Build across platforms using the `--platform` flag:
+3. Build across platforms using the `--platform` flag:
 
-```bash
-docker buildx build --platform linux/amd64,linux/arm64 -t myapp:latest .
-```
+   ```bash
+   docker buildx build --platform linux/amd64,linux/arm64 -t myapp:latest .
+   ```
 
 **Image Metadata Example (from `docker image inspect`):**
 
@@ -928,7 +929,6 @@ COPY ./fitnesse-standalone.jar .
 
 CMD ["java", "-jar", "fitnesse-standalone.jar"]
 EXPOSE 80
-
 ```
 
 **Testing and Execution:** To find out where data is being modified or stored inside a running container, use:
@@ -953,13 +953,13 @@ docker container create \
 
 The build command used locally can be repurposed for publishing. By default, `buildx` sends the built image to your local Docker engine. To instruct the build tool to push the image directly to a remote registry, append the `--push` flag.
 
-- **Authenticate with the registry:**
+**Authenticate with the registry:**
 
 ```bash
 docker login <registry_name>
 ```
 
-- **Build and push across multiple platforms:**
+**Build and push across multiple platforms:**
 
 ```bash
 docker image build --push --platform=linux/amd64,linux/arm64 \
@@ -975,20 +975,28 @@ docker image build --push --platform=linux/amd64,linux/arm64 \
 
 ### Core Dockerfile Concepts
 
-- `FROM SCRATCH` **vs. Minimal OS:**
+`FROM SCRATCH` **vs. Minimal OS:**
+
 - Using `FROM SCRATCH` means you start with an entirely empty file system (no OS).
 - Using a minimal userland (like `alpine:3.24`) provides essential OS utilities and files, which is necessary if your app relies on system-level configurations like timezones.
-- `ENTRYPOINT` **vs.** `CMD`**:**
+
+`ENTRYPOINT` **vs.** `CMD`**:**
+
 - **ENTRYPOINT:** Defines the primary executable of the container. It is harder to override at runtime (requires the `--entrypoint` flag, e.g., `--entrypoint /bin/sh`).
 - **CMD:** Provides default arguments to the `ENTRYPOINT`. It is easily overridden by appending commands to the end of `docker run`.
 - _Interaction:_ When both are used, Docker concatenates them (`ENTRYPOINT` + `CMD` = Final Command).
 - _Best Practice:_ If your image runs exactly one app, use `ENTRYPOINT`. If your image houses multiple apps or utilities and you need to specify which one to run dynamically, rely on `CMD`.
-- `ENV`**:**
+
+`ENV`**:**
+
 - Sets environment variables inside the image.
 - _Security Rule:_ Only use `ENV` for default settings. **Never** put sensitive variables (like API keys or database passwords) in a Dockerfile. Inject those via Docker Compose or `.env` files at runtime.
-- **Go Architecture Variables:**
+
+**Go Architecture Variables:**
+
 - `GOOS` and `GOARCH` are environment variables used by the Go compiler to target specific operating systems and CPU architectures during multi-platform builds.
-- **Creating a Multi-Arch Builder:**
+
+**Creating a Multi-Arch Builder:**
 
 ```bash
 docker buildx create --name builder1 --platform=linux/amd64,linux/arm64 --driver=docker-container --bootstrap --use
