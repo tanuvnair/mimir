@@ -1,8 +1,8 @@
 ---
 publish: true
 title: mimir.vunat.in
-created: 2026-07-25T08:41:47.249+05:30
-modified: 2026-07-25T01:59:21.992+05:30
+created: 2026-07-25T00:03:56.817+05:30
+modified: 2026-08-02T04:47:00.139+05:30
 ---
 
 # Welcome to mimir!
@@ -11,6 +11,7 @@ Hello, I'm Tanuv. You've found my digital garden: a collection of my thoughts, n
 
 Here are a few things you might find useful:
 
+- [Tour Of Go](thoughts/tour-of-go)
 - [Component Composition](thoughts/component-composition)
 - [Docker Training](docker-training)
 - [x86 Real-Mode Memory Map](thoughts/x86-real-mode-memory-map)
